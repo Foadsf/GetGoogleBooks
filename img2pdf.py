@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Image
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+
 import sys
 import zlib
 import argparse
@@ -156,7 +160,11 @@ def main(images, dpi, title=None, author=None, creator=None, producer=None,
             version = 5 # jpeg2000 needs pdf 1.5
         else:
             ofilter = [ "/FlateDecode" ]
-            imgdata = zlib.compress(imgdata.tostring())
+            try:
+                imgdata = zlib.compress(imgdata.tobytes())
+            except AttributeError:
+                # Fallback for older PIL versions
+                imgdata = zlib.compress(imgdata.tostring())
         im.close()
 
         image = obj({
